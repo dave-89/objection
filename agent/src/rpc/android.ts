@@ -33,6 +33,7 @@ export const android = {
   androidHookingListBroadcastReceivers: (): Promise<string[]> => hooking.getBroadcastReceivers(),
   androidHookingListServices: (): Promise<string[]> => hooking.getServices(),
   androidHookingSetMethodReturn: (fqClazz: string, ret: boolean) => hooking.setReturnValue(fqClazz, ret),
+  androidHookingSetMethodReturnString: (fqClazz: string, ret: string) => hooking.setReturnValueString(fqClazz, ret),
   androidHookingWatchClass: (clazz: string): Promise<void> => hooking.watchClass(clazz),
   androidHookingWatchMethod: (fqClazz: string, dargs: boolean, dbt: boolean, dret: boolean): Promise<void> =>
     hooking.watchMethod(fqClazz, dargs, dbt, dret),

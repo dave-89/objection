@@ -62,3 +62,7 @@ python/
 
 # Ignore the compiled agent.
 objection/agent.js
+
+
+# venv
+venv/

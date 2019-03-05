@@ -191,6 +191,27 @@ def show_registered_activities(args: list = None) -> None:
 
     click.secho('\nFound {0} classes'.format(len(activities)), bold=True)
 
+def set_method_return_value_string(args: list = None) -> None:
+    """
+        Sets a Java methods return value to a specified boolean.
+
+        :param args:
+        :return:
+    """
+
+    if len(clean_argument_flags(args)) < 2:
+        click.secho(('Usage: android hooking set return_value '
+                     '"<fully qualified class method (with overload if needed)>" (eg: "com.example.test.doLogin") '
+                     '<true/false>'),
+                    bold=True)
+        return
+
+    class_name = args[0].replace('\'', '"')  # fun!
+    retval = args[1]
+
+    api = state_connection.get_api()
+    api.android_hooking_set_method_return_string(class_name, retval)
+
 
 def set_method_return_value(args: list = None) -> None:
     """

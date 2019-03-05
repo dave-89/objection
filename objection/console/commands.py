@@ -292,6 +292,15 @@ COMMANDS = {
                             }
                         }
                     },
+                    'setString': {
+                        'meta': 'Set string values',
+                        'commands': {
+                            'return_value': {
+                                'meta': 'Set a methods return value. Supports only string returns.',
+                                'exec': android_hooking.set_method_return_value_string
+                            }
+                        }
+                    },
                     'search': {
                         'meta': 'Search for various classes and or methods',
                         'commands': {

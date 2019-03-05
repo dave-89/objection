@@ -3,6 +3,7 @@ import { IJob } from "../lib/interfaces";
 import { jobs } from "../lib/jobs";
 import { getApplicationContext, wrapJavaPerform } from "./lib/libjava";
 import { ActivityThread, ArrayMap, JavaClass, PackageManager, Throwable } from "./lib/types";
+import { type } from "os";
 
 export namespace hooking {
 
@@ -268,7 +269,47 @@ export namespace hooking {
       // tslint:disable-next-line:only-arrow-functions
       methodInstance.implementation = function() {
         let retVal = methodInstance.apply(this, arguments);
+        // Override retval if needed
+        if (retVal !== newRet) {
+          send(
+            c.blackBright(`[${job.identifier}] `) + `Return value was not ${c.red(newRet.toString())}, ` +
+            `setting to ${c.green(newRet.toString())}.`,
+          );
+          // update the return value
+          retVal = newRet;
+        }
 
+        return retVal;
+      };
+
+      // Register the job
+      job.implementations.push(methodInstance);
+      jobs.add(job);
+    });
+  };
+
+  export const setReturnValueString = (fqClazz: string, newRet: string): Promise<void> => {
+    const [clazz, method] = splitClassMethod(fqClazz);
+    send(`Attempting to modify return value for class ${c.green(clazz)} and method ${c.green(method)} to ${c.cyan(newRet)}.`);
+
+    return wrapJavaPerform(() => {
+      const job: IJob = {
+        identifier: jobs.identifier(),
+        implementations: [],
+        type: `set-return for: ${fqClazz}`,
+      };
+
+      const clazzInstance: JavaClass = Java.use(clazz);
+      const methodInstance = clazzInstance[method];
+      // TODO, check that the method in question actually returns a bool
+
+      // get the argument types for this method
+      const calleeArgTypes: string[] = methodInstance.argumentTypes.map((arg) => arg.className);
+      send(`Hooking ${c.green(clazz)}.${c.greenBright(method)}(${c.red(calleeArgTypes.join(", "))})`);
+
+      // tslint:disable-next-line:only-arrow-functions
+      methodInstance.implementation = function() {
+        let retVal = methodInstance.apply(this, arguments);
         // Override retval if needed
         if (retVal !== newRet) {
           send(
